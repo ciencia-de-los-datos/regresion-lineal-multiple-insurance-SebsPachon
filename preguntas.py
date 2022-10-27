@@ -133,11 +133,6 @@ def pregunta_03():
 
     # Retorne el mejor modelo
     return gridSearchCV
-pregunta_03().best_params_
-
-x_train, x_test, y_train, y_test =pregunta_02()
-pipeline =pregunta_03()
-pipeline.score(x_train, y_train).round(2)
 
 def pregunta_04():
     """
