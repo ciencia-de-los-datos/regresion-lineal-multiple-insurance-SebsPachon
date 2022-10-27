@@ -77,6 +77,7 @@ def pregunta_03():
     from sklearn.metrics import mean_squared_error
     import sklearn.metrics 
 
+   
     pipeline =Pipeline(
         steps=[
             # Paso 1: Construya un column_transformer que aplica OneHotEncoder a las
@@ -91,11 +92,12 @@ def pregunta_03():
                 ,remainder='passthrough')  
 
                 ),
-            
+
             # Paso 2: Construya un selector de características que seleccione las K
             # características más importantes. Utilice la función f_regression.
             (
-                "selectKBest",SelectKBest(score_func=f_regression,k=11),
+                "selectKBest",SelectKBest(score_func=f_regression,
+                                         ),
             ),
     #          # Paso 3: Construya un modelo de regresión lineal.
             (
@@ -106,16 +108,32 @@ def pregunta_03():
     ],
     )
 
-    # Cargua de las variables.
-    X_train, X_test, y_train, y_test = pregunta_02()
-    pipeline.fit(X_train,y_train)
-    pipeline._get_param_names()
-    LinearRegression._get_param_names()
-    # Defina un diccionario de parámetros para el GridSearchCV.  
+    X_new =pipeline.fit(X_train, y_train)
+    X_new.score(X_test, y_test)
+
+    pipeline.get_params(deep=True)
+    # # X_new.shape
+
+    # # # Cargua de las variables.
+    # # X_train, X_test, y_train, y_test = pregunta_02()
+
+
+    # # Defina un diccionario de parámetros para el GridSearchCV.  
     param_grid = {
-        'Lr__n_jobs': np.arange(0,5), 
+        'selectKBest__k': np.arange(1,12),    
+    #     'Lr__copy_X':[True,False],
+    #     'Lr__fit_intercept':[True,False],
+    #     'Lr__n_jobs': np.arange(0,5),
+    #     'Lr__normalize': [True,False],
+    #     'Lr__positive':[True,False] 
+
+
+
+
+
+
     }
-    
+
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
     # parámetros. Use cv = 5, y como métrica de evaluación el valor negativo del
     # error cuadrático medio.
@@ -124,15 +142,20 @@ def pregunta_03():
         param_grid=param_grid,
         cv=5,
         scoring='neg_mean_absolute_error',
-        refit=False,
-        return_train_score=True,
+        refit=True,
+        return_train_score=False
     )
     # Búsque la mejor combinación de regresores
-    gridSearchCV.fit(X_train, y_train)
+    # gridSearchCV.fit(X_train, y_train)
 
 
-    # Retorne el mejor modelo
-    return gridSearchCV
+    #     # Retorne el mejor modelo
+        return gridSearchCV
+# # gridSearchCV.score(X_test, y_test)
+# # gridSearchCV.best_params
+# # SelectKBest._get_param_names()
+# # LinearRegression._get_param_names()
+# # ColumnTransformer._get_param_names()
 
 def pregunta_04():
     """
