@@ -108,30 +108,19 @@ def pregunta_03():
     ],
     )
 
-    X_new =pipeline.fit(X_train, y_train)
-    X_new.score(X_test, y_test)
-
-    pipeline.get_params(deep=True)
-    # # X_new.shape
 
     # # # Cargua de las variables.
-    # # X_train, X_test, y_train, y_test = pregunta_02()
+    # X_train, X_test, y_train, y_test = pregunta_02()
 
 
     # # Defina un diccionario de parámetros para el GridSearchCV.  
     param_grid = {
         'selectKBest__k': np.arange(1,12),    
-    #     'Lr__copy_X':[True,False],
-    #     'Lr__fit_intercept':[True,False],
-    #     'Lr__n_jobs': np.arange(0,5),
-    #     'Lr__normalize': [True,False],
-    #     'Lr__positive':[True,False] 
-
-
-
-
-
-
+        'Lr__copy_X':[True,False],
+        'Lr__fit_intercept':[True,False],
+        'Lr__n_jobs': np.arange(0,5),
+        'Lr__normalize': [True,False],
+        'Lr__positive':[True,False] 
     }
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
@@ -146,7 +135,7 @@ def pregunta_03():
         return_train_score=False
     )
     # Búsque la mejor combinación de regresores
-    # gridSearchCV.fit(X_train, y_train)
+    gridSearchCV.fit(X_train, y_train)
 
 
     #     # Retorne el mejor modelo
@@ -156,6 +145,11 @@ def pregunta_03():
 # # SelectKBest._get_param_names()
 # # LinearRegression._get_param_names()
 # # ColumnTransformer._get_param_names()
+# # X_new =pipeline.fit(X_train, y_train)
+# # X_new.score(X_test, y_test) 
+# # pipeline.get_params(deep=True)
+# # X_new.shape
+
 
 def pregunta_04():
     """
