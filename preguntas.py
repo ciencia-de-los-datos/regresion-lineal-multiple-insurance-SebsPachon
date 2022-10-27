@@ -110,7 +110,7 @@ def pregunta_03():
 
 
     # # # Cargua de las variables.
-    # X_train, X_test, y_train, y_test = pregunta_02()
+    X_train, X_test, y_train, y_test = pregunta_02()
 
 
     # # Defina un diccionario de parámetros para el GridSearchCV.  
@@ -138,8 +138,9 @@ def pregunta_03():
     gridSearchCV.fit(X_train, y_train)
 
 
-    #     # Retorne el mejor modelo
-        return gridSearchCV
+    # Retorne el mejor modelo
+    return gridSearchCV
+    
 # # gridSearchCV.score(X_test, y_test)
 # # gridSearchCV.best_params
 # # SelectKBest._get_param_names()
