@@ -1,10 +1,8 @@
 """
 Regresión Lineal Multiple
 -----------------------------------------------------------------------------------------
-
 En este laboratorio se entrenara un modelo de regresión lineal multiple que incluye la 
 selección de las n variables más relevantes usando una prueba f.
-
 """
 # pylint: disable=invalid-name
 # pylint: disable=unsubscriptable-object
@@ -12,10 +10,8 @@ selección de las n variables más relevantes usando una prueba f.
 """
 Regresión Lineal Multiple
 -----------------------------------------------------------------------------------------
-
 En este laboratorio se entrenara un modelo de regresión lineal multiple que incluye la 
 selección de las n variables más relevantes usando una prueba f.
-
 """
 # pylint: disable=invalid-name
 # pylint: disable=unsubscriptable-object
@@ -75,9 +71,7 @@ def pregunta_03():
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import OneHotEncoder
     from sklearn.metrics import mean_squared_error
-    import sklearn.metrics 
-
-   
+    import sklearn.metrics    
     pipeline =Pipeline(
         steps=[
             # Paso 1: Construya un column_transformer que aplica OneHotEncoder a las
@@ -107,20 +101,12 @@ def pregunta_03():
             ),
     ],
     )
-
-
     # # # Cargua de las variables.
     X_train, X_test, y_train, y_test = pregunta_02()
 
-
     # # Defina un diccionario de parámetros para el GridSearchCV.  
     param_grid = {
-        'selectKBest__k': np.arange(1,12),    
-        'Lr__copy_X':[True,False],
-        'Lr__fit_intercept':[True,False],
-        'Lr__n_jobs': np.arange(0,5),
-        'Lr__normalize': [True,False],
-        'Lr__positive':[True,False] 
+        'selectKBest__k': (1,11)         
     }
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
@@ -130,26 +116,15 @@ def pregunta_03():
         estimator=pipeline,
         param_grid=param_grid,
         cv=5,
-        scoring='neg_mean_absolute_error',
+        scoring='neg_mean_squared_error',
         refit=True,
         return_train_score=False
     )
     # Búsque la mejor combinación de regresores
     gridSearchCV.fit(X_train, y_train)
-
-
     # Retorne el mejor modelo
     return gridSearchCV
-    
-# # gridSearchCV.score(X_test, y_test)
-# # gridSearchCV.best_params
-# # SelectKBest._get_param_names()
-# # LinearRegression._get_param_names()
-# # ColumnTransformer._get_param_names()
-# # X_new =pipeline.fit(X_train, y_train)
-# # X_new.score(X_test, y_test) 
-# # pipeline.get_params(deep=True)
-# # X_new.shape
+
 
 
 def pregunta_04():
