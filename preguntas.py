@@ -1,16 +1,24 @@
 """
 Regresión Lineal Multiple
 -----------------------------------------------------------------------------------------
-
 En este laboratorio se entrenara un modelo de regresión lineal multiple que incluye la 
 selección de las n variables más relevantes usando una prueba f.
+"""
+# pylint: disable=invalid-name
+# pylint: disable=unsubscriptable-object
 
+"""
+Regresión Lineal Multiple
+-----------------------------------------------------------------------------------------
+En este laboratorio se entrenara un modelo de regresión lineal multiple que incluye la 
+selección de las n variables más relevantes usando una prueba f.
 """
 # pylint: disable=invalid-name
 # pylint: disable=unsubscriptable-object
 
 import pandas as pd
-
+import numpy as np
+from sklearn import pipeline
 
 def pregunta_01():
     """
@@ -18,20 +26,15 @@ def pregunta_01():
     -------------------------------------------------------------------------------------
     """
     # Lea el archivo `insurance.csv` y asignelo al DataFrame `df`
-    df = ____
-
+    df = pd.read_csv("insurance.csv", sep=",")
     # Asigne la columna `charges` a la variable `y`.
-    ____ = ____
-
+    y = df.charges.values
     # Asigne una copia del dataframe `df` a la variable `X`.
-    ____ = ____.____(____)
-
+    X =df.copy()
     # Remueva la columna `charges` del DataFrame `X`.
-    ____.____(____)
-
+    X=X.drop(['charges'], axis=1)
     # Retorne `X` y `y`
     return X, y
-
 
 def pregunta_02():
     """
@@ -40,95 +43,88 @@ def pregunta_02():
     """
 
     # Importe train_test_split
-    from ____ import ____
+    from sklearn.model_selection import train_test_split
+
 
     # Cargue los datos y asigne los resultados a `X` y `y`.
     X, y = pregunta_01()
 
     # Divida los datos de entrenamiento y prueba. La semilla del generador de números
     # aleatorios es 12345. Use 300 patrones para la muestra de prueba.
-    (X_train, X_test, y_train, y_test,) = ____(
-        ____,
-        ____,
-        test_size=____,
-        random_state=____,
-    )
+    (X_train, X_test, y_train, y_test,) = train_test_split(X, y,test_size=300/len(X), random_state= 12345,)
 
     # Retorne `X_train`, `X_test`, `y_train` y `y_test`
     return X_train, X_test, y_train, y_test
-
 
 def pregunta_03():
     """
     Especificación del pipeline y entrenamiento
     -------------------------------------------------------------------------------------
     """
-
-    # Importe make_column_selector
-    # Importe make_column_transformer
-    # Importe SelectKBest
-    # Importe f_regression
-    # Importe LinearRegression
-    # Importe GridSearchCV
-    # Importe Pipeline
-    # Importe OneHotEncoder
-    from ____ import ____
-
-    pipeline = ____(
+    from sklearn.compose import ColumnTransformer
+    from sklearn.compose import make_column_selector
+    from sklearn.compose import make_column_transformer
+    from sklearn.feature_selection import SelectKBest
+    from sklearn.feature_selection import f_regression
+    from sklearn.linear_model import LinearRegression
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.metrics import mean_squared_error
+    import sklearn.metrics    
+    pipeline =Pipeline(
         steps=[
             # Paso 1: Construya un column_transformer que aplica OneHotEncoder a las
             # variables categóricas, y no aplica ninguna transformación al resto de
             # las variables.
             (
-                "column_transfomer",
-                ____(
-                    (
-                        ____(),
-                        ____(____=____),
-                    ),
-                    remainder=____,
+                "col_trans",
+                ColumnTransformer(
+                transformers=[
+                ("onehot", OneHotEncoder(dtype="int"),
+                make_column_selector(dtype_include=object))]
+                ,remainder='passthrough')  
+
                 ),
-            ),
+
             # Paso 2: Construya un selector de características que seleccione las K
             # características más importantes. Utilice la función f_regression.
             (
-                "selectKBest",
-                ____(____=____),
+                "selectKBest",SelectKBest(score_func=f_regression,
+                                         ),
             ),
-            # Paso 3: Construya un modelo de regresión lineal.
+    #          # Paso 3: Construya un modelo de regresión lineal.
             (
-                "____",
-                ____(____),
+                "Lr",
+                LinearRegression()
+    ,
             ),
-        ],
+    ],
     )
+    # # # Cargua de las variables.
+    X_train, X_test, y_train, y_test = pregunta_02()
 
-    # Cargua de las variables.
-    X_train, _, y_train, _ = pregunta_02()
-
-    # Defina un diccionario de parámetros para el GridSearchCV. Se deben
-    # considerar valores desde 1 hasta 11 regresores para el modelo
+    # # Defina un diccionario de parámetros para el GridSearchCV.  
     param_grid = {
-        ____: ____(____, ____),
+        'selectKBest__k': (1,11)         
     }
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
     # parámetros. Use cv = 5, y como métrica de evaluación el valor negativo del
     # error cuadrático medio.
-    gridSearchCV = ____(
-        estimator=____,
-        param_grid=____,
-        cv=____,
-        scoring=____,
-        refit=____,
-        return_train_score=____,
+    gridSearchCV = GridSearchCV(
+        estimator=pipeline,
+        param_grid=param_grid,
+        cv=5,
+        scoring='neg_mean_squared_error',
+        refit=True,
+        return_train_score=False
     )
-
     # Búsque la mejor combinación de regresores
     gridSearchCV.fit(X_train, y_train)
-
     # Retorne el mejor modelo
     return gridSearchCV
+
 
 
 def pregunta_04():
@@ -138,7 +134,7 @@ def pregunta_04():
     """
 
     # Importe mean_squared_error
-    from ____ import ____
+    from sklearn.metrics import mean_squared_error
 
     # Obtenga el pipeline optimo de la pregunta 3.
     gridSearchCV = pregunta_03()
@@ -147,20 +143,16 @@ def pregunta_04():
     X_train, X_test, y_train, y_test = pregunta_02()
 
     # Evalúe el modelo con los conjuntos de entrenamiento y prueba.
-    y_train_pred = ____.____(____)
-    y_test_pred = ____.____(____)
+    y_train_pred = gridSearchCV.predict(X_train)
+    y_test_pred = gridSearchCV.predict(X_test)
 
     # Compute el error cuadratico medio de entrenamiento y prueba. Redondee los
     # valores a dos decimales.
 
-    mse_train = ____(
-        _____,
-        _____,
+    mse_train = mean_squared_error(y_train_pred,y_train
     ).round(2)
 
-    mse_test = ____(
-        _____,
-        _____,
+    mse_test = mean_squared_error(y_test_pred,y_test
     ).round(2)
 
     # Retorne el error cuadrático medio para entrenamiento y prueba
